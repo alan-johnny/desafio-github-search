@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import br.com.igorbag.githubsearch.R
 import br.com.igorbag.githubsearch.data.GitHubService
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupView()
+        setupListeners()
         showUserName()
         setupRetrofit()
         getAllReposByUserName()
@@ -96,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 
                 } else {
                 // Tratar caso a lista seja nula, mostrando uma mensagem para o usuário
-                  Toast.makeText(context ,R.string.error, Toast.LENGTH_LONG).show()
+                 Toast.makeText(this@MainActivity,R.string.error, Toast.LENGTH_LONG).show()
                 }
 
             }
@@ -104,23 +106,27 @@ class MainActivity : AppCompatActivity() {
             override fun onFailure(call: retrofit2.Call<List<Repository>>, t: Throwable) {
                 // TODO 9 - Implementar a tratativa de falha do retrofit
                 // Exemplo: exibe uma mensagem de erro na tela
-               // Toast.makeText(context, R.string.error, Toast.LENGTH_LONG).show()
+                Toast.makeText(this@MainActivity, R.string.error, Toast.LENGTH_LONG).show()
             }
         })
     }
 
     // Metodo responsavel por realizar a configuracao do adapter
     fun setupAdapter(list: List<Repository>) {
-        /*
-             7 - Implementar a configuracao do Adapter , construir o adapter e instancia-lo
-            passando a listagem dos repositorios
-         */
-        // Exemplo:
-        val adapter = RepositoryAdapter(list)
-        listaRepositories.adapter = adapter
+
+            if (list.isNotEmpty()) {
+                val adapter = RepositoryAdapter(list).apply {
+                    btnShareLister = { repository ->
+                        shareRepositoryLink(repository.htmlUrl)
+                    }
+                }
+                listaRepositories.adapter = adapter
+            } else {
+                Toast.makeText(this, "Nenhum repositório encontrado", Toast.LENGTH_SHORT).show()
+            }
+        }
 
 
-    }
 
 
     // Metodo responsavel por compartilhar o link do repositorio selecionado
@@ -139,14 +145,13 @@ class MainActivity : AppCompatActivity() {
     // Metodo responsavel por abrir o browser com o link informado do repositorio
 
     // @Todo 12 - Colocar esse metodo no click item do adapter
-    fun openBrowser(urlRepository: String) {
+   fun openBrowser(urlRepository: String) {
         startActivity(
             Intent(
                 Intent.ACTION_VIEW,
                 Uri.parse(urlRepository)
             )
         )
-
-    }
+   }
 
 }

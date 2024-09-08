@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import br.com.igorbag.githubsearch.R
 import br.com.igorbag.githubsearch.domain.Repository
+import br.com.igorbag.githubsearch.ui.MainActivity
 
 class RepositoryAdapter(private val repositories: List<Repository>) :
     RecyclerView.Adapter<RepositoryAdapter.ViewHolder>() {
@@ -24,33 +25,38 @@ class RepositoryAdapter(private val repositories: List<Repository>) :
 
     // Pega o conteudo da view e troca pela informacao de item de uma lista
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        // 8 -  Realizar o bind do viewHolder
-        //Exemplo de Bind
-        holder.repo.text = repositories[position].name
 
-        // Exemplo de click no item
-        //holder.itemView.setOnClickListener {
-        // carItemLister(repositores[position])
-        //}
+        val repository = repositories[position]
 
-        // Exemplo de click no btn Share
-        //holder.favorito.setOnClickListener {
-        //    btnShareLister(repositores[position])
-        //}
+        // Define o nome do repositório
+        holder.repo.text = repository.name
+
+        // Clique no botão compartilhar
+        holder.share.setOnClickListener {
+            btnShareLister(repository)
+        }
+
+        // Clique no item para abrir o navegador
+        holder.itemView.setOnClickListener {
+
+                val context = holder.itemView.context
+                if (context is MainActivity) {
+                    context.openBrowser(repository.htmlUrl)
+                }
+        }
     }
-
+    
     // Pega a quantidade de repositorios da lista
     //@TODO 9 - realizar a contagem da lista
-    override fun getItemCount(): Int = repositories.size
+    override fun getItemCount(): Int {
+        return repositories.size
+    }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         //@TODO 10 - Implementar o ViewHolder para os repositorios
         //Exemplo:
-        var repo : TextView = view.findViewById(R.id.tv_repo)
-       var  share : ImageView = view.findViewById(R.id.iv_share)
-
-
-
+             var repo : TextView = view.findViewById(R.id.tv_repo)
+             var  share : ImageView = view.findViewById(R.id.iv_share)
     }
 }
 
